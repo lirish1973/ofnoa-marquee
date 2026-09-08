@@ -44,6 +44,9 @@ jobs:
                    --exclude 'build' \
                    --exclude 'node_modules' \
                    --exclude '.gitignore' \
+                   --exclude 'Claude outputs' \
+                   --exclude 'push.ps1' \
+                   --exclude 'push.bat' \
                    --exclude '*.zip' \
                    ./ build/ofnoa-marquee/
           cd build && zip -qr ../ofnoa-marquee.zip ofnoa-marquee

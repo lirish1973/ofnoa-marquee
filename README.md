@@ -199,10 +199,25 @@ mapping the key to a CSS variable in `OMQ_Render::inline_vars()`.
 
 ### Releasing
 
+`push.ps1` does the whole run from Windows — it refuses to push when the version in
+`ofnoa-marquee.php`, `OMQ_VERSION` and `readme.txt` disagree, so a release can't go out
+half-bumped:
+
+```powershell
+.\push.ps1                                    # push what is already committed
+.\push.ps1 -Message "fix: separator spacing"  # commit everything, then push
+.\push.ps1 -Zip -Tag -Release                 # build the ZIP, tag v<version>, publish the release
+```
+
+`push.bat` is a double-click wrapper for the same thing. Neither file ships inside the
+plugin ZIP.
+
+Doing it by hand instead:
+
 ```bash
 # bump the version in ofnoa-marquee.php, readme.txt and CHANGELOG.md first
-git tag v1.0.1
-git push origin v1.0.1
+git tag v1.0.2
+git push origin v1.0.2
 ```
 
 The GitHub Action builds `ofnoa-marquee.zip` (correctly nested in an `ofnoa-marquee/`
