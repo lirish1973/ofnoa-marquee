@@ -230,6 +230,56 @@
 	unicode-bidi: plaintext;
 }
 
+/* ---------------------------------------------------------------------------
+ * Defensive layer.
+ *
+ * Themes and page builders very often ship rules like
+ *     .some-wrapper img { width: 100%; height: auto; }
+ * with a higher specificity than a single class. Inside a track whose width is
+ * `max-content`, `width:100%` becomes circular: the image grows to fill a track
+ * that is sized by the image. The result is a logo rendered at thousands of
+ * pixels, a marquee several screens tall, and an animation so long it looks
+ * frozen. These rules pin the geometry that the marquee depends on.
+ *
+ * Everything here still reads from the custom properties, so a marquee is
+ * restyled by overriding the variable, e.g.
+ *     {{WRAPPER}} { --omq-logo-h: 80px; }
+ * ------------------------------------------------------------------------- */
+
+.omq .omq__row .omq__item .omq__img {
+	display: block !important;
+	height: var(--omq-logo-h, 60px) !important;
+	width: auto !important;
+	min-width: 0 !important;
+	max-width: var(--omq-logo-maxw, none) !important;
+	max-height: none !important;
+	object-fit: var(--omq-logo-fit, contain) !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	float: none !important;
+	position: static !important;
+}
+
+.omq .omq__row .omq__item {
+	flex: 0 0 auto !important;
+	max-width: none !important;
+	float: none !important;
+}
+
+.omq .omq__track,
+.omq .omq__group {
+	flex-wrap: nowrap !important;
+	max-width: none !important;
+	list-style: none !important;
+}
+
+/* If the fade-in keyframes never tick (background tab, a builder that freezes
+ * animations), the JS "built" class still reveals the marquee. */
+.omq--fadein.is-built {
+	opacity: 1;
+	animation: none;
+}
+
 /* ---------- separators ---------- */
 
 .omq__sep {

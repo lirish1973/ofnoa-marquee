@@ -129,6 +129,16 @@ instance's ID:
 {{WRAPPER}} .omq__text { text-shadow: 0 2px 8px rgba(0,0,0,.2); }
 ```
 
+### Restyling images
+
+The image geometry (height, width, fit) is enforced with `!important`, because themes
+routinely override plain classes and break the marquee's layout. Change it through the
+custom properties rather than by re-declaring the properties:
+
+```css
+{{WRAPPER}} { --omq-logo-h: 80px; --omq-logo-maxw: 200px; --omq-logo-fit: cover; }
+```
+
 ## Markup & hooks
 
 ```html

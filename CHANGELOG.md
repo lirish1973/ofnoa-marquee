@@ -3,6 +3,23 @@
 All notable changes to Ofnoa Marquee are documented here.
 This project follows [Semantic Versioning](https://semver.org/).
 
+## [1.0.2] - 2026-09-08
+
+### Fixed
+- **Logos rendered at their full natural size on some themes.** Themes and page
+  builders commonly ship `img { width: 100%; height: auto }` at a higher
+  specificity than a single class. Inside a track sized with `max-content` that
+  becomes circular — the image fills a track that is sized by the image — so a
+  60px logo rendered at ~3000px, the marquee grew several screens tall and the
+  loop stretched to ~24 minutes, which looks exactly like "nothing happens".
+  The geometry the marquee depends on (image height, width, fit, item flex,
+  nowrap) is now pinned, while still reading from the CSS variables, so
+  `{{WRAPPER}} { --omq-logo-h: 80px; }` remains the way to restyle it.
+- Fade-in no longer depends solely on a CSS animation: the JS "built" class also
+  reveals the marquee, so it can't stay invisible where keyframes never tick.
+- A row measuring over 50,000px now logs a console warning naming the likely
+  theme rule, instead of silently animating something absurd.
+
 ## [1.0.1] - 2026-09-08
 
 ### Fixed

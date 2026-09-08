@@ -4,7 +4,7 @@ Tags: marquee, ticker, logo carousel, news ticker, scrolling text
 Requires at least: 5.8
 Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,6 +55,12 @@ visual speed.
 Not on the front end — the engine is vanilla JavaScript and the animation itself is pure CSS.
 
 == Changelog ==
+
+= 1.0.2 =
+* Fixed: on themes that force `img { width:100%; height:auto }`, logos rendered at full
+  natural size and the marquee appeared frozen. Image geometry is now pinned.
+* Fixed: fade-in could leave a marquee invisible where CSS keyframes never run.
+* Added: console warning when a theme rule blows up the measured row width.
 
 = 1.0.1 =
 * Fixed: draft marquees were hidden from the Elementor / block / widget pickers, which

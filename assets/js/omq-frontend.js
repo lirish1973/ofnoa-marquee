@@ -79,6 +79,14 @@
 				return;
 			}
 
+			// A theme rule forcing `img { width:100% }` turns a max-content track
+			// into a runaway layout. Warn instead of animating something absurd.
+			if ( size > 50000 && window.console && console.warn ) {
+				console.warn(
+					'[Ofnoa Marquee] Row measured ' + Math.round( size ) + 'px — a theme or builder rule is probably overriding the logo size. Check for `img { width:100%; height:auto }` rules applying to .omq__img.'
+				);
+			}
+
 			var shift = size + gap;
 			var vrect = viewport.getBoundingClientRect();
 			var vsize = vertical ? vrect.height : vrect.width;
