@@ -135,48 +135,78 @@ fi
 
 make_zip() {
 	# Build ofnoa-marquee.zip from the tracked files, nested inside ofnoa-marquee/.
-	local staging root zip_path
+	#
+	# Everything happens with RELATIVE paths inside a staging directory, because
+	# Git Bash hands MSYS paths (/f/...) to native Windows tools, which cannot
+	# read them. Relative paths inherit the working directory instead, so the
+	# same code works for msys `zip`, a native python.exe, PowerShell and bsdtar.
+	local staging src zip_path out method count py
 	zip_path="$PWD/ofnoa-marquee.zip"
 	staging=$(mktemp -d 2>/dev/null || mktemp -d -t omq)
-	root="$staging/ofnoa-marquee"
-	mkdir -p "$root"
+	src="$staging/src"
+	out="$staging/out.zip"
+	mkdir -p "$src/ofnoa-marquee"
 
 	# git ls-files is the source of truth: whatever .gitignore already excludes
 	# can never sneak into a release, and dev-only files are filtered here.
 	git ls-files \
 		| grep -vE '^(\.github/|\.gitignore$|push\.(ps1|bat|sh)$|ofnoa-marquee\.zip$)' \
 		| while IFS= read -r f; do
-			mkdir -p "$root/$(dirname "$f")"
-			cp "$f" "$root/$f"
+			mkdir -p "$src/ofnoa-marquee/$(dirname "$f")"
+			cp "$f" "$src/ofnoa-marquee/$f"
 		done
 
-	local count
-	count=$(find "$root" -type f | wc -l | tr -d ' ')
+	count=$(find "$src" -type f | wc -l | tr -d ' ')
 	[ "$count" -gt 0 ] || { rm -rf "$staging"; die "Nothing to package."; }
 
-	rm -f "$zip_path"
+	method=""
 
+	# 1. Real zip binary.
 	if have zip; then
-		( cd "$staging" && zip -qr "$zip_path" ofnoa-marquee )
-	elif have python3; then
-		( cd "$staging" && python3 -c "import shutil,sys; shutil.make_archive(sys.argv[1][:-4],'zip','.','ofnoa-marquee')" "$zip_path" )
-	elif have python; then
-		( cd "$staging" && python -c "import shutil,sys; shutil.make_archive(sys.argv[1][:-4],'zip','.','ofnoa-marquee')" "$zip_path" )
-	elif have powershell.exe; then
-		# Git Bash on Windows without zip: fall back to .NET via PowerShell.
-		powershell.exe -NoProfile -Command \
-			"Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::CreateFromDirectory('$(cygpath -w "$staging" 2>/dev/null || echo "$staging")','$(cygpath -w "$zip_path" 2>/dev/null || echo "$zip_path")',[System.IO.Compression.CompressionLevel]::Optimal,\$false)" \
-			|| { rm -rf "$staging"; die "PowerShell could not build the ZIP."; }
-	elif [ -x /c/Windows/System32/tar.exe ]; then
-		( cd "$staging" && /c/Windows/System32/tar.exe -a -c -f "$(cygpath -w "$zip_path" 2>/dev/null || echo "$zip_path")" ofnoa-marquee )
-	else
-		rm -rf "$staging"
-		die "No way to create a ZIP here — install 'zip', or run push.ps1 instead."
+		rm -f "$out"
+		( cd "$src" && zip -qr ../out.zip ofnoa-marquee ) >/dev/null 2>&1
+		[ -s "$out" ] && method="zip"
 	fi
 
+	# 2. Python — but only a real interpreter. On Windows, python3/python are
+	#    often App Execution Alias stubs that print a banner and create nothing,
+	#    so probe before trusting them.
+	if [ -z "$method" ]; then
+		for py in python3 python py; do
+			have "$py" || continue
+			[ "$("$py" -c 'print(42)' 2>/dev/null | tr -d '\r')" = "42" ] || continue
+			rm -f "$out"
+			( cd "$src" && "$py" -c "import shutil; shutil.make_archive('../out','zip','.','ofnoa-marquee')" ) >/dev/null 2>&1
+			if [ -s "$out" ]; then method="$py"; break; fi
+		done
+	fi
+
+	# 3. PowerShell (always present on Windows).
+	if [ -z "$method" ] && have powershell.exe; then
+		rm -f "$out"
+		( cd "$staging" && powershell.exe -NoProfile -NonInteractive -Command \
+			"Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::CreateFromDirectory((Join-Path (Get-Location).Path 'src'), (Join-Path (Get-Location).Path 'out.zip'), [System.IO.Compression.CompressionLevel]::Optimal, \$false)" \
+		) >/dev/null 2>&1
+		[ -s "$out" ] && method="powershell"
+	fi
+
+	# 4. Windows' own bsdtar, which writes zip when the extension says so.
+	if [ -z "$method" ] && [ -x /c/Windows/System32/tar.exe ]; then
+		rm -f "$out"
+		( cd "$src" && /c/Windows/System32/tar.exe -a -c -f ../out.zip ofnoa-marquee ) >/dev/null 2>&1
+		[ -s "$out" ] && method="bsdtar"
+	fi
+
+	if [ -z "$method" ]; then
+		rm -rf "$staging"
+		die "No working ZIP tool found (tried zip, python, PowerShell, bsdtar). Install 'zip', or run push.ps1 instead."
+	fi
+
+	rm -f "$zip_path"
+	mv "$out" "$zip_path" || { rm -rf "$staging"; die "Could not move the archive into place."; }
 	rm -rf "$staging"
-	[ -f "$zip_path" ] || die "The ZIP was not created."
-	good "ofnoa-marquee.zip ($count files, $(du -k "$zip_path" | cut -f1) KB)"
+
+	good "ofnoa-marquee.zip ($count files, $(du -k "$zip_path" | cut -f1) KB, via $method)"
 }
 
 if [ "$DO_ZIP" -eq 1 ]; then
