@@ -209,8 +209,21 @@ half-bumped:
 .\push.ps1 -Zip -Tag -Release                 # build the ZIP, tag v<version>, publish the release
 ```
 
-`push.bat` is a double-click wrapper for the same thing. Neither file ships inside the
-plugin ZIP.
+`push.bat` is a double-click wrapper for the same thing.
+
+The same flow in bash — Git Bash on Windows, WSL, Linux, macOS:
+
+```bash
+./push.sh                                   # push what is already committed
+./push.sh -m "fix: separator spacing"       # commit everything, then push
+./push.sh -z -t -r                          # build the ZIP, tag v<version>, publish the release
+./push.sh -n                                # dry run: print every step, change nothing
+```
+
+`push.sh` packages from `git ls-files`, so nothing `.gitignore` excludes can reach a
+release, and it falls back through `zip` → `python3` → PowerShell → Windows `bsdtar`
+so it works even in a bare Git Bash install. None of the `push.*` files ship inside
+the plugin ZIP.
 
 Doing it by hand instead:
 
