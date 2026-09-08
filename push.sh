@@ -206,7 +206,7 @@ make_zip() {
 	mv "$out" "$zip_path" || { rm -rf "$staging"; die "Could not move the archive into place."; }
 	rm -rf "$staging"
 
-	good "ofnoa-marquee.zip ($count files, $(du -k "$zip_path" | cut -f1) KB, via $method)"
+	good "ofnoa-marquee.zip ($count files, $(( $(wc -c < "$zip_path") / 1024 )) KB, via $method)"
 }
 
 if [ "$DO_ZIP" -eq 1 ]; then
