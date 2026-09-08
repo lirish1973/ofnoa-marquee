@@ -47,6 +47,45 @@ class OMQ_Render {
 	}
 
 	/**
+	 * Whether the late (post-footer) asset fallback has already been printed.
+	 *
+	 * @var bool
+	 */
+	protected static $late_assets_done = false;
+
+	/**
+	 * Make sure the front-end CSS/JS are on the page, whatever renders us.
+	 *
+	 * Normally the handles are registered on wp_enqueue_scripts and this simply
+	 * enqueues them. But page builders, REST previews and footer widgets can
+	 * render a marquee outside that flow — in which case we register on the
+	 * spot, and if even wp_footer has already run we print the tags inline so
+	 * the marquee can never end up on a page without its assets.
+	 *
+	 * @return string Markup to prepend, empty in the normal case.
+	 */
+	public static function enqueue_assets() {
+		if ( ! wp_style_is( 'omq-frontend', 'registered' ) ) {
+			wp_register_style( 'omq-frontend', OMQ_URL . 'assets/css/omq-frontend.css', array(), OMQ_VERSION );
+		}
+		if ( ! wp_script_is( 'omq-frontend', 'registered' ) ) {
+			wp_register_script( 'omq-frontend', OMQ_URL . 'assets/js/omq-frontend.js', array(), OMQ_VERSION, true );
+		}
+
+		wp_enqueue_style( 'omq-frontend' );
+		wp_enqueue_script( 'omq-frontend' );
+
+		// Too late for the normal queues — emit the tags ourselves, once.
+		if ( did_action( 'wp_footer' ) && ! self::$late_assets_done ) {
+			self::$late_assets_done = true;
+			return '<link rel="stylesheet" href="' . esc_url( OMQ_URL . 'assets/css/omq-frontend.css?ver=' . OMQ_VERSION ) . '">'
+				. '<script src="' . esc_url( OMQ_URL . 'assets/js/omq-frontend.js?ver=' . OMQ_VERSION ) . '"></script>';
+		}
+
+		return '';
+	}
+
+	/**
 	 * Render a saved marquee by post ID.
 	 *
 	 * @param int   $post_id   Marquee post ID.
@@ -60,8 +99,22 @@ class OMQ_Render {
 		if ( ! $post || OMQ_CPT !== $post->post_type ) {
 			return self::notice( __( 'Marquee not found.', 'ofnoa-marquee' ) );
 		}
-		if ( 'publish' !== $post->post_status && ! current_user_can( 'edit_post', $post_id ) ) {
+		$can_edit = current_user_can( 'edit_post', $post_id );
+
+		if ( 'publish' !== $post->post_status && ! $can_edit ) {
 			return '';
+		}
+
+		$warning = '';
+		if ( 'publish' !== $post->post_status && $can_edit ) {
+			$warning = self::notice(
+				sprintf(
+					/* translators: %s: marquee title */
+					__( 'Heads up: the marquee "%s" is not published yet, so visitors will not see it. Only you (as an editor) see it here.', 'ofnoa-marquee' ),
+					$post->post_title
+				),
+				'warning'
+			);
 		}
 
 		$settings = OMQ_Fields::get_settings( $post_id );
@@ -77,7 +130,7 @@ class OMQ_Render {
 
 		$items = self::collect_items( $settings, OMQ_Fields::get_items( $post_id ) );
 
-		return self::render( $settings, $items, 'omq-' . $post_id . '-' . ( ++self::$seq ) );
+		return $warning . self::render( $settings, $items, 'omq-' . $post_id . '-' . ( ++self::$seq ) );
 	}
 
 	/**
@@ -86,11 +139,13 @@ class OMQ_Render {
 	 * @param string $message Message.
 	 * @return string
 	 */
-	protected static function notice( $message ) {
+	protected static function notice( $message, $type = 'error' ) {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			return '';
 		}
-		return '<div class="omq-notice" style="padding:10px;border:1px dashed #dc2626;color:#dc2626;font:13px/1.4 sans-serif">' . esc_html( $message ) . '</div>';
+		$color = ( 'warning' === $type ) ? '#b45309' : '#dc2626';
+		return '<div class="omq-notice omq-notice--' . esc_attr( $type ) . '" style="padding:10px;margin:0 0 8px;border:1px dashed ' . $color . ';color:' . $color . ';font:13px/1.4 sans-serif">'
+			. esc_html( $message ) . '</div>';
 	}
 
 	/**
@@ -154,8 +209,7 @@ class OMQ_Render {
 			$uid = 'omq-' . wp_rand( 1000, 999999 );
 		}
 
-		wp_enqueue_style( 'omq-frontend' );
-		wp_enqueue_script( 'omq-frontend' );
+		$late_assets = self::enqueue_assets();
 
 		$rows      = max( 1, min( 3, (int) $settings['rows'] ) );
 		$vertical  = in_array( $settings['direction'], array( 'up', 'down' ), true );
@@ -213,6 +267,7 @@ class OMQ_Render {
 		$group_html = self::items_html( $items, $settings );
 
 		ob_start();
+		echo $late_assets; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo self::scoped_css( $uid, $settings ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		?>
 		<div id="<?php echo esc_attr( $uid ); ?>"

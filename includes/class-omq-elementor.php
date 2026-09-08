@@ -69,19 +69,12 @@ class OMQ_Elementor {
 	 * @return array
 	 */
 	public static function options() {
-		$out      = array( 0 => __( '— Select a marquee —', 'ofnoa-marquee' ) );
-		$marquees = get_posts(
-			array(
-				'post_type'      => OMQ_CPT,
-				'posts_per_page' => 200,
-				'post_status'    => 'publish',
-				'orderby'        => 'title',
-				'order'          => 'ASC',
-			)
-		);
-		foreach ( $marquees as $marquee ) {
-			$out[ $marquee->ID ] = $marquee->post_title ? $marquee->post_title : '#' . $marquee->ID;
+		$out = array( 0 => __( '— Select a marquee —', 'ofnoa-marquee' ) );
+
+		foreach ( OMQ_Post_Type::get_marquees() as $marquee ) {
+			$out[ $marquee->ID ] = OMQ_Post_Type::label( $marquee );
 		}
+
 		return $out;
 	}
 }

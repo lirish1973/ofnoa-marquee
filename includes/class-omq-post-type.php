@@ -63,6 +63,47 @@ class OMQ_Post_Type {
 	}
 
 	/**
+	 * All marquees an editor may pick from — including drafts, which would
+	 * otherwise be invisible in every picker while still being editable.
+	 *
+	 * @return WP_Post[]
+	 */
+	public static function get_marquees() {
+		return get_posts(
+			array(
+				'post_type'        => OMQ_CPT,
+				'posts_per_page'   => 200,
+				'post_status'      => array( 'publish', 'draft', 'pending', 'private' ),
+				'orderby'          => 'title',
+				'order'            => 'ASC',
+				'suppress_filters' => false,
+			)
+		);
+	}
+
+	/**
+	 * A marquee's label for a picker, flagging anything not published.
+	 *
+	 * @param WP_Post $marquee Marquee post.
+	 * @return string
+	 */
+	public static function label( $marquee ) {
+		$title = $marquee->post_title ? $marquee->post_title : sprintf( '#%d', $marquee->ID );
+
+		if ( 'publish' !== $marquee->post_status ) {
+			$statuses = array(
+				'draft'   => __( 'draft — not visible to visitors', 'ofnoa-marquee' ),
+				'pending' => __( 'pending review', 'ofnoa-marquee' ),
+				'private' => __( 'private', 'ofnoa-marquee' ),
+			);
+			$note     = isset( $statuses[ $marquee->post_status ] ) ? $statuses[ $marquee->post_status ] : $marquee->post_status;
+			$title   .= ' (' . $note . ')';
+		}
+
+		return $title;
+	}
+
+	/**
 	 * Title placeholder.
 	 *
 	 * @param string  $text Placeholder.

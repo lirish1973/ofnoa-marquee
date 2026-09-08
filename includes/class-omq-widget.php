@@ -72,13 +72,7 @@ class OMQ_Marquee_Widget extends WP_Widget {
 	public function form( $instance ) {
 		$title    = isset( $instance['title'] ) ? $instance['title'] : '';
 		$selected = isset( $instance['marquee_id'] ) ? absint( $instance['marquee_id'] ) : 0;
-		$marquees = get_posts(
-			array(
-				'post_type'      => OMQ_CPT,
-				'posts_per_page' => 200,
-				'post_status'    => 'publish',
-			)
-		);
+		$marquees = OMQ_Post_Type::get_marquees();
 		?>
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_html_e( 'Title:', 'ofnoa-marquee' ); ?></label>
@@ -90,7 +84,7 @@ class OMQ_Marquee_Widget extends WP_Widget {
 				<option value="0"><?php esc_html_e( '— Select —', 'ofnoa-marquee' ); ?></option>
 				<?php foreach ( $marquees as $marquee ) : ?>
 					<option value="<?php echo (int) $marquee->ID; ?>" <?php selected( $selected, $marquee->ID ); ?>>
-						<?php echo esc_html( $marquee->post_title ); ?>
+						<?php echo esc_html( OMQ_Post_Type::label( $marquee ) ); ?>
 					</option>
 				<?php endforeach; ?>
 			</select>

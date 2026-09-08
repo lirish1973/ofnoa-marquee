@@ -3,7 +3,7 @@
  * Plugin Name:       Ofnoa Marquee — Logo & Text Ticker
  * Plugin URI:        https://github.com/lirish1973/ofnoa-marquee
  * Description:       Professional, fully customizable marquee / ticker for logos and text. Unlimited marquees, 4 directions, dual rows, edge fade, per-device settings, Gutenberg block, Elementor widget and shortcode.
- * Version:           1.0.0
+ * Version:           1.0.1
  * Requires at least: 5.8
  * Requires PHP:      7.2
  * Author:            Liraz
@@ -19,7 +19,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'OMQ_VERSION', '1.0.0' );
+define( 'OMQ_VERSION', '1.0.1' );
 define( 'OMQ_FILE', __FILE__ );
 define( 'OMQ_DIR', plugin_dir_path( __FILE__ ) );
 define( 'OMQ_URL', plugin_dir_url( __FILE__ ) );

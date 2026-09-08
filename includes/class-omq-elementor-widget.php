@@ -238,6 +238,29 @@ class OMQ_Elementor_Widget extends \Elementor\Widget_Base {
 	}
 
 	/**
+	 * Whether we are inside the Elementor editor.
+	 *
+	 * @return bool
+	 */
+	protected function in_editor() {
+		return class_exists( '\Elementor\Plugin' )
+			&& isset( \Elementor\Plugin::$instance->editor )
+			&& \Elementor\Plugin::$instance->editor->is_edit_mode();
+	}
+
+	/**
+	 * Editor-only notice.
+	 *
+	 * @param string $message Message.
+	 */
+	protected function editor_notice( $message ) {
+		if ( ! $this->in_editor() ) {
+			return;
+		}
+		echo '<div class="elementor-alert elementor-alert-info">' . esc_html( $message ) . '</div>';
+	}
+
+	/**
 	 * Front-end render.
 	 */
 	protected function render() {
@@ -245,9 +268,18 @@ class OMQ_Elementor_Widget extends \Elementor\Widget_Base {
 		$id       = isset( $settings['marquee_id'] ) ? absint( $settings['marquee_id'] ) : 0;
 
 		if ( ! $id ) {
-			if ( \Elementor\Plugin::$instance->editor->is_edit_mode() ) {
-				echo '<div class="elementor-alert elementor-alert-info">' . esc_html__( 'Select a marquee to display.', 'ofnoa-marquee' ) . '</div>';
-			}
+			$available = OMQ_Post_Type::get_marquees();
+			$this->editor_notice(
+				$available
+					? __( 'Select a marquee in the widget settings.', 'ofnoa-marquee' )
+					: __( 'No marquees exist yet — create one under Marquee → Add New, then select it here.', 'ofnoa-marquee' )
+			);
+			return;
+		}
+
+		$marquee = get_post( $id );
+		if ( ! $marquee || OMQ_CPT !== $marquee->post_type ) {
+			$this->editor_notice( __( 'The selected marquee no longer exists. Pick another one.', 'ofnoa-marquee' ) );
 			return;
 		}
 
@@ -264,6 +296,13 @@ class OMQ_Elementor_Widget extends \Elementor\Widget_Base {
 			$overrides['bg_type'] = 'solid';
 		}
 
-		echo OMQ_Render::render_post( $id, $overrides ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		$html = OMQ_Render::render_post( $id, $overrides );
+
+		if ( '' === trim( $html ) ) {
+			$this->editor_notice( __( 'This marquee produced no output — check that it has items and is published.', 'ofnoa-marquee' ) );
+			return;
+		}
+
+		echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 }

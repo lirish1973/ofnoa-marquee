@@ -107,25 +107,16 @@ class OMQ_Block {
 			true
 		);
 
-		$marquees = get_posts(
-			array(
-				'post_type'      => OMQ_CPT,
-				'posts_per_page' => 200,
-				'post_status'    => 'publish',
-				'orderby'        => 'title',
-				'order'          => 'ASC',
-			)
-		);
-
 		$options = array(
 			array(
 				'label' => __( '— Select a marquee —', 'ofnoa-marquee' ),
 				'value' => 0,
 			),
 		);
-		foreach ( $marquees as $marquee ) {
+
+		foreach ( OMQ_Post_Type::get_marquees() as $marquee ) {
 			$options[] = array(
-				'label' => $marquee->post_title ? $marquee->post_title : sprintf( '#%d', $marquee->ID ),
+				'label' => OMQ_Post_Type::label( $marquee ),
 				'value' => $marquee->ID,
 			);
 		}
