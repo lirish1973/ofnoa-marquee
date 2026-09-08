@@ -24,3 +24,6 @@ dist/
 # Local config
 .env
 .env.*
+
+# Files the Claude desktop app drops here
+Claude outputs/
