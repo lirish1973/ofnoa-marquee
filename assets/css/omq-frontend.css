@@ -1,0 +1,300 @@
+/*!
+ * Ofnoa Marquee — front-end styles
+ * All visual values come from CSS custom properties set per instance.
+ */
+
+.omq {
+	position: relative;
+	display: block;
+	width: 100%;
+	max-width: var(--omq-maxw, 100%);
+	margin-top: var(--omq-margin-y, 0);
+	margin-bottom: var(--omq-margin-y, 0);
+	margin-inline: auto;
+	padding: var(--omq-pad-y, 0) var(--omq-pad-x, 0);
+	background: var(--omq-bg, transparent);
+	border-width: var(--omq-bw, 0);
+	border-style: var(--omq-bs, solid);
+	border-color: var(--omq-bc, transparent);
+	border-radius: var(--omq-radius, 0);
+	box-shadow: var(--omq-shadow, none);
+	overflow: hidden;
+	z-index: var(--omq-z, auto);
+	-webkit-tap-highlight-color: transparent;
+}
+
+.omq *,
+.omq *::before,
+.omq *::after {
+	box-sizing: border-box;
+}
+
+/* ---------- rows ---------- */
+
+.omq__row + .omq__row {
+	margin-top: var(--omq-rows-gap, 20px);
+}
+
+.omq--vertical {
+	display: flex;
+	flex-direction: row;
+	gap: var(--omq-rows-gap, 20px);
+	align-items: stretch;
+}
+
+.omq--vertical .omq__row {
+	flex: 1 1 0;
+	min-width: 0;
+}
+
+.omq--vertical .omq__row + .omq__row {
+	margin-top: 0;
+}
+
+/* ---------- viewport ---------- */
+
+.omq__viewport {
+	position: relative;
+	width: 100%;
+	overflow: hidden;
+	direction: ltr;
+}
+
+.omq--vertical .omq__viewport {
+	height: var(--omq-vheight, 320px);
+}
+
+.omq--fade.omq--horizontal .omq__viewport {
+	-webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--omq-fade, 80px), #000 calc(100% - var(--omq-fade, 80px)), transparent 100%);
+	mask-image: linear-gradient(90deg, transparent 0, #000 var(--omq-fade, 80px), #000 calc(100% - var(--omq-fade, 80px)), transparent 100%);
+}
+
+.omq--fade.omq--vertical .omq__viewport {
+	-webkit-mask-image: linear-gradient(180deg, transparent 0, #000 var(--omq-fade, 80px), #000 calc(100% - var(--omq-fade, 80px)), transparent 100%);
+	mask-image: linear-gradient(180deg, transparent 0, #000 var(--omq-fade, 80px), #000 calc(100% - var(--omq-fade, 80px)), transparent 100%);
+}
+
+/* ---------- track & groups ---------- */
+
+.omq__track {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	align-items: var(--omq-align, center);
+	gap: var(--omq-gap, 40px);
+	width: max-content;
+	direction: ltr;
+	animation-name: omq-x;
+	animation-duration: var(--omq-dur, 30s);
+	animation-timing-function: var(--omq-timing, linear);
+	animation-iteration-count: infinite;
+	animation-delay: var(--omq-delay, 0ms);
+	animation-direction: var(--omq-adir, normal);
+	animation-play-state: paused;
+	will-change: transform;
+	backface-visibility: hidden;
+	transform: translateZ(0);
+}
+
+.omq.is-ready .omq__track {
+	animation-play-state: running;
+}
+
+.omq.is-paused .omq__track,
+.omq--pause-hover:hover .omq__track,
+.omq--pause-hover:focus-within .omq__track {
+	animation-play-state: paused;
+}
+
+.omq--vertical .omq__track {
+	flex-direction: column;
+	width: 100%;
+	height: max-content;
+	animation-name: omq-y;
+}
+
+.omq__group {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	align-items: var(--omq-align, center);
+	gap: var(--omq-gap, 40px);
+	flex: 0 0 auto;
+	direction: ltr;
+}
+
+.omq--vertical .omq__group {
+	flex-direction: column;
+	width: 100%;
+}
+
+/* ---------- direction ---------- */
+
+.omq--dir-left .omq__track,
+.omq--dir-up .omq__track {
+	--omq-adir: normal;
+}
+
+.omq--dir-right .omq__track,
+.omq--dir-down .omq__track {
+	--omq-adir: reverse;
+}
+
+.omq--dir-left .omq__row--rev .omq__track,
+.omq--dir-up .omq__row--rev .omq__track {
+	--omq-adir: reverse;
+}
+
+.omq--dir-right .omq__row--rev .omq__track,
+.omq--dir-down .omq__row--rev .omq__track {
+	--omq-adir: normal;
+}
+
+@keyframes omq-x {
+	from {
+		transform: translate3d(0, 0, 0);
+	}
+	to {
+		transform: translate3d(calc(var(--omq-shift, 0px) * -1), 0, 0);
+	}
+}
+
+@keyframes omq-y {
+	from {
+		transform: translate3d(0, 0, 0);
+	}
+	to {
+		transform: translate3d(0, calc(var(--omq-shift, 0px) * -1), 0);
+	}
+}
+
+/* ---------- items ---------- */
+
+.omq__item {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	flex: 0 0 auto;
+	text-decoration: none;
+	background: var(--omq-item-bg, transparent);
+	border-width: var(--omq-item-bw, 0);
+	border-style: solid;
+	border-color: var(--omq-item-bc, transparent);
+	border-radius: var(--omq-item-radius, 0);
+	padding: var(--omq-item-py, 0) var(--omq-item-px, 0);
+	box-shadow: var(--omq-item-shadow, none);
+	color: var(--omq-color, inherit);
+	font-family: var(--omq-ff, inherit);
+	font-size: var(--omq-fs, 18px);
+	font-weight: var(--omq-fw, inherit);
+	line-height: var(--omq-lh, 1.4);
+	letter-spacing: var(--omq-ls, 0);
+	text-transform: var(--omq-tt, none);
+	text-shadow: var(--omq-tshadow, none);
+	white-space: nowrap;
+	transition: transform var(--omq-trans, 300ms) ease, background-color var(--omq-trans, 300ms) ease, color var(--omq-trans, 300ms) ease, box-shadow var(--omq-trans, 300ms) ease;
+}
+
+.omq__item:hover,
+.omq__item:focus-visible {
+	background: var(--omq-item-bg-h, var(--omq-item-bg, transparent));
+	color: var(--omq-color-h, var(--omq-color, inherit));
+	transform: scale(var(--omq-h-scale, 1));
+}
+
+.omq__item:focus-visible {
+	outline: 2px solid var(--omq-color-h, #4f46e5);
+	outline-offset: 3px;
+}
+
+.omq__img {
+	display: block;
+	height: var(--omq-logo-h, 60px);
+	width: auto;
+	max-width: var(--omq-logo-maxw, none);
+	object-fit: var(--omq-logo-fit, contain);
+	filter: grayscale(var(--omq-gray, 0%));
+	opacity: var(--omq-op, 1);
+	mix-blend-mode: var(--omq-blend, normal);
+	transition: filter var(--omq-trans, 300ms) ease, opacity var(--omq-trans, 300ms) ease;
+}
+
+.omq__item:hover .omq__img,
+.omq__item:focus-visible .omq__img {
+	filter: grayscale(var(--omq-h-gray, 0%));
+	opacity: var(--omq-h-op, 1);
+}
+
+.omq__text {
+	unicode-bidi: plaintext;
+}
+
+/* ---------- separators ---------- */
+
+.omq__sep {
+	flex: 0 0 auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--omq-sep-color, currentColor);
+	font-size: var(--omq-sep-size, 18px);
+	line-height: 1;
+	user-select: none;
+	pointer-events: none;
+}
+
+.omq__sep--line {
+	width: 2px;
+	height: calc(var(--omq-sep-size, 18px) * 1.6);
+	background: var(--omq-sep-color, currentColor);
+	border-radius: 2px;
+}
+
+.omq--vertical .omq__sep--line {
+	width: calc(var(--omq-sep-size, 18px) * 1.6);
+	height: 2px;
+}
+
+/* ---------- fade in ---------- */
+
+.omq--fadein {
+	opacity: 0;
+	animation: omq-fade-in 0.6s ease 0.15s forwards;
+}
+
+@keyframes omq-fade-in {
+	to {
+		opacity: 1;
+	}
+}
+
+/* ---------- accessibility ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+	.omq--rm .omq__track {
+		animation: none !important;
+		transform: none !important;
+	}
+	.omq--rm .omq__viewport {
+		overflow-x: auto;
+		overflow-y: hidden;
+		scrollbar-width: thin;
+	}
+	.omq--rm.omq--fadein {
+		opacity: 1;
+		animation: none;
+	}
+	.omq--rm .omq__item {
+		transition: none;
+	}
+}
+
+/* ---------- editor / preview helpers ---------- */
+
+.omq-preview-wrap {
+	background: repeating-conic-gradient(#f3f4f6 0% 25%, #ffffff 0% 50%) 50% / 20px 20px;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	padding: 12px;
+}

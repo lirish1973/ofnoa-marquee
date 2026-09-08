@@ -1,0 +1,425 @@
+/*!
+ * Ofnoa Marquee — admin builder styles
+ */
+
+.omq-builder {
+	margin: -6px -12px -12px;
+	font-size: 13px;
+}
+
+/* ---------- tabs ---------- */
+
+.omq-tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 2px;
+	padding: 10px 12px 0;
+	background: #f6f7f7;
+	border-bottom: 1px solid #dcdcde;
+}
+
+.omq-tab {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 9px 14px;
+	background: transparent;
+	border: 1px solid transparent;
+	border-bottom: none;
+	border-radius: 6px 6px 0 0;
+	cursor: pointer;
+	font-weight: 600;
+	color: #50575e;
+	line-height: 1.2;
+}
+
+.omq-tab:hover {
+	color: #2271b1;
+}
+
+.omq-tab.is-active {
+	background: #fff;
+	border-color: #dcdcde;
+	color: #1d2327;
+	margin-bottom: -1px;
+	padding-bottom: 10px;
+}
+
+.omq-tab .dashicons {
+	font-size: 17px;
+	width: 17px;
+	height: 17px;
+}
+
+/* ---------- panels ---------- */
+
+.omq-panel {
+	display: none;
+	padding: 18px 16px;
+	background: #fff;
+}
+
+.omq-panel.is-active {
+	display: block;
+}
+
+.omq-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+	gap: 16px 22px;
+}
+
+.omq-field.is-hidden {
+	display: none;
+}
+
+.omq-field--wide {
+	grid-column: 1 / -1;
+}
+
+.omq-field__label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 5px;
+	color: #1d2327;
+}
+
+.omq-field__desc {
+	margin: 5px 0 0;
+	color: #646970;
+	font-size: 12px;
+	font-style: italic;
+}
+
+.omq-input,
+.omq-field select,
+.omq-field input[type="text"],
+.omq-field input[type="url"],
+.omq-field input[type="number"] {
+	width: 100%;
+	max-width: 100%;
+}
+
+.omq-number {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.omq-number em {
+	color: #787c82;
+	font-style: normal;
+	font-size: 11px;
+	white-space: nowrap;
+}
+
+.omq-range {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.omq-range__input {
+	flex: 1;
+}
+
+.omq-range__out {
+	min-width: 54px;
+	text-align: center;
+	font-variant-numeric: tabular-nums;
+	background: #f0f0f1;
+	border-radius: 4px;
+	padding: 2px 6px;
+	font-size: 12px;
+}
+
+/* ---------- switch ---------- */
+
+.omq-switch {
+	display: inline-flex;
+	align-items: center;
+	cursor: pointer;
+}
+
+.omq-switch input[type="checkbox"] {
+	position: absolute;
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+.omq-switch__ui {
+	position: relative;
+	width: 42px;
+	height: 22px;
+	background: #c3c4c7;
+	border-radius: 999px;
+	transition: background 0.2s ease;
+	display: inline-block;
+}
+
+.omq-switch__ui::after {
+	content: "";
+	position: absolute;
+	top: 3px;
+	left: 3px;
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: #fff;
+	transition: transform 0.2s ease;
+}
+
+.omq-switch input[type="checkbox"]:checked + .omq-switch__ui {
+	background: #2271b1;
+}
+
+.omq-switch input[type="checkbox"]:checked + .omq-switch__ui::after {
+	transform: translateX(20px);
+}
+
+.omq-switch input[type="checkbox"]:focus-visible + .omq-switch__ui {
+	box-shadow: 0 0 0 2px #2271b1;
+}
+
+/* ---------- responsive mini inputs ---------- */
+
+.omq-responsive {
+	display: flex;
+	gap: 8px;
+	margin-top: 6px;
+}
+
+.omq-responsive__item {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	flex: 1;
+}
+
+.omq-responsive__item .dashicons {
+	color: #8c8f94;
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+.omq-responsive__item input {
+	width: 100%;
+}
+
+/* ---------- items repeater ---------- */
+
+.omq-items-toolbar {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+	margin-bottom: 14px;
+}
+
+.omq-items-toolbar .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	margin-top: 3px;
+}
+
+.omq-items {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.omq-items-empty {
+	padding: 24px;
+	text-align: center;
+	border: 2px dashed #dcdcde;
+	border-radius: 8px;
+	color: #787c82;
+	margin: 0;
+}
+
+.omq-item-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 10px;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.omq-item-placeholder {
+	height: 74px;
+	border: 2px dashed #2271b1;
+	border-radius: 8px;
+	background: #f0f6fc;
+	margin-bottom: 8px;
+}
+
+.omq-item-handle {
+	cursor: grab;
+	color: #a7aaad;
+}
+
+.omq-item-media {
+	position: relative;
+	flex: 0 0 auto;
+	width: 64px;
+	text-align: center;
+}
+
+.omq-item-thumb {
+	width: 56px;
+	height: 56px;
+	object-fit: contain;
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	padding: 4px;
+	display: block;
+	margin: 0 auto;
+}
+
+.omq-item-media-actions {
+	display: flex;
+	justify-content: center;
+	gap: 6px;
+	font-size: 11px;
+	margin-top: 2px;
+}
+
+.omq-item-fields {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 12px;
+	flex: 1;
+	min-width: 0;
+}
+
+.omq-mini {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 110px;
+}
+
+.omq-mini--grow {
+	flex: 1 1 180px;
+}
+
+.omq-mini > span {
+	font-size: 11px;
+	color: #646970;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+}
+
+.omq-mini--check {
+	flex-direction: row;
+	align-items: center;
+	gap: 5px;
+	align-self: flex-end;
+	padding-bottom: 4px;
+}
+
+.omq-item-remove {
+	background: none;
+	border: none;
+	cursor: pointer;
+	color: #b32d2e;
+	padding: 4px;
+	border-radius: 4px;
+}
+
+.omq-item-remove:hover {
+	background: #fcf0f1;
+}
+
+/* ---------- preview ---------- */
+
+.omq-preview-toolbar {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+	margin-bottom: 12px;
+}
+
+.omq-preview-toolbar .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	vertical-align: text-top;
+}
+
+.omq-inline-label {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.omq-preview-devices {
+	display: inline-flex;
+	gap: 2px;
+	margin-inline-start: auto;
+}
+
+.omq-preview-devices .button.is-active {
+	background: #2271b1;
+	border-color: #2271b1;
+	color: #fff;
+}
+
+.omq-preview-stage {
+	display: flex;
+	justify-content: center;
+	background: #f6f7f7;
+	border-radius: 8px;
+	padding: 14px;
+	overflow: hidden;
+	resize: vertical;
+}
+
+#omq-preview {
+	transition: width 0.25s ease;
+	max-width: 100%;
+}
+
+.omq-preview-empty {
+	text-align: center;
+	color: #787c82;
+	margin: 24px 0;
+}
+
+/* ---------- misc ---------- */
+
+code.omq-copy {
+	cursor: pointer;
+	user-select: all;
+}
+
+code.omq-copy:hover {
+	background: #f0f6fc;
+	color: #2271b1;
+}
+
+code.omq-copy.is-copied {
+	background: #edfaef;
+	color: #007017;
+}
+
+.omq-tools-card {
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	padding: 18px 20px;
+	margin: 16px 0;
+	max-width: 880px;
+}
+
+.omq-tools-card h2 {
+	margin-top: 0;
+}
